@@ -1,0 +1,47 @@
+version: '2'
+services:
+  application:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - keycloak
+      - openldap-custom
+    networks:
+      - my-network
+    ports:
+      - '8082:8686'
+  openldap-custom:
+    image: bitnami/openldap:latest
+    ports:
+      - '1389:1389'
+      - '1636:1636'
+    environment:
+      - LDAP_ADMIN_USERNAME=admin
+      - LDAP_ADMIN_PASSWORD=adminpassword
+      - LDAP_USERS=user01,user02
+      - LDAP_PASSWORDS=password1,password2
+      - LDAP_BASE=dc=newspace,dc=org
+      - LDAP_BIND_DN=cn=admin,dc=newspace,dc=org
+      - LDAP_BIND_PASSWORD=adminpassword
+    networks:
+      - my-network
+    volumes:
+      - 'openldap_data:/bitnami/openldap'
+  keycloak:
+    image: keycloak/keycloak
+    ports:
+      - '8081:8081'
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    command:
+      - start-dev
+    networks:
+      - my-network
+volumes:
+  openldap_data:
+    driver: local
+networks:
+  my-network:
+    driver: bridge

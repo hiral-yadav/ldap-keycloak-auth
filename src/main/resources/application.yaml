@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: keycloak-ldap-auth
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8081/realms/test
+        registration:
+          test-cli:
+            provider: keycloak
+            client-secret: ZiZoc6ob5LIz7tTSvUltow9cOuukaltJ
+            scope: openid, profile, roles
+            client-id: test-cli
+            authorization-grant-type: client_credentials
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/test
+server:
+  port: 8082
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
